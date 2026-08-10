@@ -1,0 +1,21 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "title": "React Router setup etmək",
+      "completed": true
+    },
+    {
+      "id": "2",
+      "title": "Redux Toolkit ilə Auth idarə etmək",
+      "completed": false
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "email": "test@example.com",
+      "token": "fake-jwt-token-12345"
+    }
+  ]
+}
