@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchTasksApi, addTaskApi, deleteTaskApi, toggleTaskApi } from '../api/taskApi';
+import { fetchTasksApi, addTaskApi, deleteTaskApi, toggleTaskApi, updateTaskApi } from '../api/taskApi';
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   return await fetchTasksApi();
@@ -9,13 +9,34 @@ export const addTask = createAsyncThunk('tasks/addTask', async (taskData) => {
   return await addTaskApi(taskData);
 });
 
-// Optimistic Delete
 export const deleteTask = createAsyncThunk(
   'tasks/deleteTask',
   async (id, { rejectWithValue }) => {
     try {
       await deleteTaskApi(id);
       return id;
+    } catch (error) {
+      return rejectWithValue({ id, message: error.message });
+    }
+  }
+);
+
+export const toggleTask = createAsyncThunk(
+  'tasks/toggleTask',
+  async (task, { rejectWithValue }) => {
+    try {
+      return await toggleTaskApi(task);
+    } catch (error) {
+      return rejectWithValue({ task, message: error.message });
+    }
+  }
+);
+
+export const updateTask = createAsyncThunk(
+  'tasks/updateTask',
+  async ({ id, changes }, { rejectWithValue }) => {
+    try {
+      return await updateTaskApi(id, changes);
     } catch (error) {
       return rejectWithValue({ id, message: error.message });
     }
@@ -32,7 +53,6 @@ const taskSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Tasks
       .addCase(fetchTasks.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -46,20 +66,46 @@ const taskSlice = createSlice({
         state.error = action.error.message;
       })
 
-      // Add Task
       .addCase(addTask.fulfilled, (state, action) => {
         state.items.push(action.payload);
       })
 
-      // Optimistic Delete Handling
       .addCase(deleteTask.pending, (state, action) => {
-        // Server cavabı gəlmədən DƏRHAL UI-dan silirik
         const idToDelete = action.meta.arg;
         state.items = state.items.filter((item) => item.id !== idToDelete);
       })
-      .addCase(deleteTask.rejected, (state, action) => {
-        // Xəta baş verərsə bildiriş veririk (istəyə uyğun olaraq məlumatı yenidən yükləmək olar)
+      .addCase(deleteTask.rejected, (state) => {
         state.error = 'Silinmə zamanı xəta baş verdi! Səhifəni yeniləyin.';
+      })
+
+      .addCase(toggleTask.pending, (state, action) => {
+        const task = action.meta.arg;
+        state.items = state.items.map((item) =>
+          item.id === task.id ? { ...item, completed: !item.completed } : item
+        );
+      })
+      .addCase(toggleTask.fulfilled, (state, action) => {
+        const updatedTask = action.payload;
+        state.items = state.items.map((item) =>
+          item.id === updatedTask.id ? updatedTask : item
+        );
+      })
+      .addCase(toggleTask.rejected, (state, action) => {
+        const task = action.payload?.task;
+        if (task) {
+          state.items = state.items.map((item) =>
+            item.id === task.id ? { ...item, completed: task.completed } : item
+          );
+        }
+        state.error = action.payload?.message || 'Tapşırıq yeniləmək olmur.';
+      })
+
+      .addCase(updateTask.fulfilled, (state, action) => {
+        const updated = action.payload;
+        state.items = state.items.map((item) => (item.id === updated.id ? updated : item));
+      })
+      .addCase(updateTask.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Tapşırıq yenilənmədi.';
       });
   },
 });

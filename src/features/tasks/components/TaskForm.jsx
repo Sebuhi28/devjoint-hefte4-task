@@ -3,26 +3,47 @@ import { useDispatch } from 'react-redux';
 import { addTask } from '../slice/taskSlice';
 
 export const TaskForm = () => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    defaultValues: { priority: 'medium', dueDate: '' },
+  });
   const dispatch = useDispatch();
 
   const onSubmit = (data) => {
-    dispatch(addTask({ title: data.title, completed: false }));
-    reset();
+    dispatch(addTask({
+      title: data.title,
+      completed: false,
+      priority: data.priority,
+      dueDate: data.dueDate || null,
+    }));
+    reset({ title: '', priority: 'medium', dueDate: '' });
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
-      <div style={{ flexGrow: 1 }}>
+    <form onSubmit={handleSubmit(onSubmit)} className="task-form">
+      <div className="task-form-field task-form-title">
         <input
           type="text"
+          className="form-input"
           placeholder="Yeni tapşırıq yazın..."
           {...register('title', { required: 'Başlıq boş ola bilməz' })}
-          style={{ width: '100%', padding: '8px' }}
+          aria-invalid={errors.title ? 'true' : 'false'}
         />
-        {errors.title && <span style={{ color: 'red', fontSize: '12px' }}>{errors.title.message}</span>}
+        {errors.title && <span className="form-error">{errors.title.message}</span>}
       </div>
-      <button type="submit" style={{ padding: '8px 16px', height: '36px' }}>Əlavə et</button>
+
+      <div className="task-form-field">
+        <select className="form-input" {...register('priority')}>
+          <option value="low">Aşağı prioritet</option>
+          <option value="medium">Orta prioritet</option>
+          <option value="high">Yüksək prioritet</option>
+        </select>
+      </div>
+
+      <div className="task-form-field">
+        <input type="date" className="form-input" {...register('dueDate')} />
+      </div>
+
+      <button type="submit" className="primary-button task-button">Əlavə et</button>
     </form>
   );
 };

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../features/auth/slice/authSlice';
 
@@ -6,23 +6,42 @@ export const Navbar = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   const handleLogout = () => {
-    dispatch(logout()); // Token və user məlumatları təmizlənir
-    navigate('/login', { replace: true }); // Geri düyməsi ilə qorunan səhifəyə qayıtmağı bloklayır
+    dispatch(logout());
+    navigate('/login', { replace: true });
   };
 
+  const tabClass = ({ isActive }) => `nav-tab${isActive ? ' active' : ''}`;
+
   return (
-    <nav style={{ display: 'flex', gap: '20px', padding: '15px', background: '#f0f0f0' }}>
-      {isAuthenticated ? (
-        <>
-          <Link to="/tasks">Tapşırıqlar</Link>
-          <Link to="/profile">Profil ({user?.email})</Link>
-          <button onClick={handleLogout} style={{ marginLeft: 'auto' }}>Çıxış Et (Logout)</button>
-        </>
-      ) : (
-        <Link to="/login">Daxil Ol</Link>
-      )}
+    <nav className={`site-navbar${isAuthPage ? ' minimal' : ''}`}>
+      <div className="nav-inner">
+        <div className="nav-brand">
+          <span className="nav-brand-dot" />
+          Task Manager
+        </div>
+
+        {isAuthenticated && (
+          <div className="nav-tabs">
+            <NavLink to="/tasks" className={tabClass}>Tapşırıqlar</NavLink>
+            <NavLink to="/profile" className={tabClass}>Profil</NavLink>
+          </div>
+        )}
+
+        {isAuthenticated && (
+          <div className="nav-user">
+            <span className="nav-user-avatar">{user?.email?.[0]?.toUpperCase()}</span>
+            <span className="nav-user-email">{user?.email}</span>
+            <button className="nav-logout" onClick={handleLogout} title="Çıxış" aria-label="Çıxış">
+              ⏻
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };

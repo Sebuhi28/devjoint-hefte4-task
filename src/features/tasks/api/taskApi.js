@@ -19,3 +19,8 @@ export const toggleTaskApi = async (task) => {
   const response = await api.patch(`/tasks/${task.id}`, { completed: !task.completed });
   return response.data;
 };
+
+export const updateTaskApi = async (id, changes) => {
+  const response = await api.patch(`/tasks/${id}`, changes);
+  return response.data;
+};

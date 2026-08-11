@@ -3,12 +3,16 @@
     {
       "id": "1",
       "title": "React Router setup etmək",
-      "completed": true
+      "completed": false,
+      "priority": "medium",
+      "dueDate": null
     },
     {
-      "id": "2",
-      "title": "Redux Toolkit ilə Auth idarə etmək",
-      "completed": false
+      "title": "salam",
+      "completed": true,
+      "id": "bzIxRRV5VG0",
+      "priority": "high",
+      "dueDate": null
     }
   ],
   "users": [
@@ -17,5 +21,6 @@
       "email": "test@example.com",
       "token": "fake-jwt-token-12345"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
