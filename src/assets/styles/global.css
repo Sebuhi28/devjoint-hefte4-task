@@ -123,6 +123,12 @@ input {
     font-weight: 500;
     font-size: 0.9rem;
     transition: all 0.18s ease;
+    outline: none;
+}
+
+.nav-tab:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 2px;
 }
 
 .nav-tab:hover {
@@ -206,6 +212,11 @@ input {
 
 .page-header {
     margin-bottom: 28px;
+}
+
+.page-section-narrow {
+    max-width: 640px;
+    margin: 0 auto;
 }
 
 .page-header h2 {
@@ -556,20 +567,22 @@ input {
 /* ---------- Profile ---------- */
 
 .profile-card {
-    max-width: 520px;
-    padding: 26px;
+    max-width: 100%;
+    padding: 0 0 26px;
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     background: white;
     box-shadow: var(--shadow-md);
-    display: grid;
-    gap: 22px;
+    overflow: hidden;
+    display: block;
 }
 
 .profile-header {
     display: flex;
     align-items: center;
     gap: 16px;
+    padding: 0 26px 20px;
+    margin-top: -28px;
 }
 
 .profile-avatar {
@@ -584,6 +597,7 @@ input {
     font-weight: 700;
     font-size: 1.1rem;
     flex-shrink: 0;
+    border: 4px solid white;
 }
 
 .profile-name {
@@ -605,8 +619,11 @@ input {
 .profile-details {
     display: grid;
     gap: 14px;
-    padding-top: 18px;
+    padding: 18px 26px 0;
     border-top: 1px solid var(--border);
+    margin: 0 26px;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .profile-detail-row {
@@ -652,6 +669,11 @@ input {
 
 .profile-copy-btn:hover {
     background: var(--brand-light);
+}
+
+.profile-banner {
+    height: 84px;
+    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
 }
 
 /* ---------- Error / status ---------- */
@@ -843,26 +865,251 @@ input {
     margin-bottom: 8px;
 }
 
+/* ---------- Task toolbar (search + filter) ---------- */
+
+.task-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.task-search-input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 999px;
+}
+
+.filter-tab {
+    border: none;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.filter-tab:hover {
+    color: #334155;
+}
+
+.filter-tab.active {
+    background: white;
+    color: var(--brand-dark);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+/* task-title indi Link olduğu üçün */
+.task-title {
+    text-decoration: none;
+    color: inherit;
+}
+
+.task-title:hover {
+    color: var(--brand);
+    text-decoration: underline;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: var(--brand);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Confirm modal ---------- */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.modal-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-title {
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+    color: #111827;
+}
+
+.modal-message {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-confirm-btn {
+    padding: 10px 18px;
+}
+
+/* ---------- Toasts ---------- */
+
+.toast-stack {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1100;
+}
+
+.toast {
+    padding: 13px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    color: white;
+    animation: toast-in 0.2s ease;
+    max-width: 320px;
+}
+
+.toast-success {
+    background: #16a34a;
+}
+
+.toast-error {
+    background: #dc2626;
+}
+
+/* ---------- Task detail grid ---------- */
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+}
+
+.detail-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #f8fafc;
+}
+
+.detail-card-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.detail-card-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.detail-card-id {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #475569;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.detail-edit-btn {
+  padding: 12px 20px;
+  font-size: 0.95rem;
+}
+
+.detail-edit-fields {
+  display: grid;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.page-header .task-meta {
+    margin-top: 10px;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 720px) {
     .nav-inner {
-        justify-content: center;
-        text-align: center;
         grid-template-columns: 1fr;
         justify-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+
+    .nav-user,
+    .nav-tabs {
+        width: auto;
+        justify-self: center;
     }
 
     .nav-user {
-        width: 100%;
-        justify-content: center;
-        margin-left: 0;
+        padding: 5px 6px 5px 10px;
     }
 
-    .nav-tabs {
-        max-width: 100%;
-        width: 100%;
-        justify-content: center;
+    .nav-user-email {
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .app-content {
@@ -909,5 +1156,24 @@ input {
 
     .task-card-editing .task-edit-actions {
         flex-direction: row;
+    }
+
+    .task-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-tabs {
+        justify-content: center;
+    }
+
+    .toast-stack {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .toast {
+        max-width: none;
     }
 }

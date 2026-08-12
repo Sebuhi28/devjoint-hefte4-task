@@ -1,13 +1,6 @@
 {
   "tasks": [
     {
-      "id": "1",
-      "title": "React Router setup etmək",
-      "completed": false,
-      "priority": "medium",
-      "dueDate": null
-    },
-    {
       "title": "salam",
       "completed": true,
       "id": "bzIxRRV5VG0",

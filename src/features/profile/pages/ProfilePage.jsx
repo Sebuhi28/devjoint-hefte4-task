@@ -21,13 +21,15 @@ export const ProfilePage = () => {
     : user?.email?.[0]?.toUpperCase();
 
   return (
-    <section className="page-section">
+    <section className="page-section page-section-narrow">
       <div className="page-header">
         <h2>Profil</h2>
         <p className="page-description">İstifadəçi məlumatlarınız burada saxlanır.</p>
       </div>
 
       <div className="profile-card">
+        <div className="profile-banner" />
+
         <div className="profile-header">
           <div className="profile-avatar">{initials}</div>
           <div>

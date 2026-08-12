@@ -1,13 +1,23 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTasks } from '../slice/taskSlice';
 import { TaskForm } from '../components/TaskForm';
 import { TaskCard } from '../components/TaskCard';
 import { ErrorBoundary } from '../../../components/feedback/ErrorBoundary';
+import { useDebounce } from '../../../utils/useDebounce';
+
+const FILTERS = [
+  { key: 'all', label: 'Hamısı' },
+  { key: 'active', label: 'Aktiv' },
+  { key: 'completed', label: 'Tamamlanmış' },
+];
 
 export const TasksPage = () => {
   const dispatch = useDispatch();
   const { items: tasks, loading, error } = useSelector((state) => state.tasks);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 300);
 
   useEffect(() => {
     dispatch(fetchTasks());
@@ -22,10 +32,24 @@ export const TasksPage = () => {
     };
   }, [tasks]);
 
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((task) => {
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && !task.completed) ||
+        (statusFilter === 'completed' && task.completed);
+
+      const matchesSearch = task.title.toLowerCase().includes(debouncedSearch.trim().toLowerCase());
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [tasks, statusFilter, debouncedSearch]);
+
   return (
     <section className="page-section">
       <div className="page-header">
         <h2>Tapşırıqlar Siyahısı</h2>
+        <p className="page-description">Mock API ilə CRUD, optimistik UI və React Hook Form doğrulaması.</p>
       </div>
 
       <div className="task-stats">
@@ -47,6 +71,28 @@ export const TasksPage = () => {
         <TaskForm />
       </ErrorBoundary>
 
+      <div className="task-toolbar">
+        <input
+          type="text"
+          className="form-input task-search-input"
+          placeholder="Tapşırıq axtar..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <div className="filter-tabs">
+          {FILTERS.map((filter) => (
+            <button
+              key={filter.key}
+              type="button"
+              className={`filter-tab ${statusFilter === filter.key ? 'active' : ''}`}
+              onClick={() => setStatusFilter(filter.key)}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {loading && <p className="status-message">Yüklənir...</p>}
       {error && <p className="status-message error">{error}</p>}
 
@@ -57,9 +103,16 @@ export const TasksPage = () => {
         </div>
       )}
 
+      {!loading && tasks.length > 0 && filteredTasks.length === 0 && (
+        <div className="empty-state">
+          <div className="empty-state-icon">🔍</div>
+          <p>Axtarışa uyğun tapşırıq tapılmadı.</p>
+        </div>
+      )}
+
       <ErrorBoundary>
         <div className="task-list">
-          {tasks.map((task) => (
+          {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}
         </div>

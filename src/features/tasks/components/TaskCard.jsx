@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { deleteTask, toggleTask, updateTask } from '../slice/taskSlice';
+import { ConfirmDialog } from '../../../components/common/ConfirmDialog';
+import { useToast } from '../../../components/feedback/ToastProvider';
 
 const PRIORITY_LABELS = {
   low: 'Aşağı',
@@ -10,23 +13,36 @@ const PRIORITY_LABELS = {
 
 export const TaskCard = ({ task }) => {
   const dispatch = useDispatch();
+  const { addToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [priority, setPriority] = useState(task.priority || 'medium');
   const [dueDate, setDueDate] = useState(task.dueDate || '');
-
-  const handleDelete = () => {
-    dispatch(deleteTask(task.id));
-  };
 
   const handleToggle = () => {
     dispatch(toggleTask(task));
   };
 
-  const handleSave = () => {
+  const handleDeleteConfirmed = async () => {
+    setShowConfirm(false);
+    try {
+      await dispatch(deleteTask(task.id)).unwrap();
+      addToast('Tapşırıq silindi', 'success');
+    } catch {
+      addToast('Silinmə zamanı xəta baş verdi', 'error');
+    }
+  };
+
+  const handleSave = async () => {
     if (!title.trim()) return;
-    dispatch(updateTask({ id: task.id, changes: { title, priority, dueDate: dueDate || null } }));
-    setIsEditing(false);
+    try {
+      await dispatch(updateTask({ id: task.id, changes: { title, priority, dueDate: dueDate || null } })).unwrap();
+      setIsEditing(false);
+      addToast('Tapşırıq yeniləndi', 'success');
+    } catch {
+      addToast('Yenilənmə zamanı xəta baş verdi', 'error');
+    }
   };
 
   const handleCancel = () => {
@@ -79,29 +95,41 @@ export const TaskCard = ({ task }) => {
   }
 
   return (
-    <div className="task-card">
-      <button
-        type="button"
-        className={`toggle-button ${task.completed ? 'completed' : ''}`}
-        onClick={handleToggle}
-      >
-        {task.completed ? '✔' : '○'}
-      </button>
+    <>
+      <div className="task-card">
+        <button
+          type="button"
+          className={`toggle-button ${task.completed ? 'completed' : ''}`}
+          onClick={handleToggle}
+        >
+          {task.completed ? '✔' : '○'}
+        </button>
 
-      <div className="task-info">
-        <span className={`task-title ${task.completed ? 'task-done' : ''}`}>{task.title}</span>
-        <div className="task-meta">
-          <span className={`priority-badge priority-${task.priority || 'medium'}`}>
-            {PRIORITY_LABELS[task.priority] || PRIORITY_LABELS.medium}
-          </span>
-          {task.dueDate && <span className="due-date-badge">📅 {task.dueDate}</span>}
+        <div className="task-info">
+          <Link to={`/tasks/${task.id}`} className={`task-title ${task.completed ? 'task-done' : ''}`}>
+            {task.title}
+          </Link>
+          <div className="task-meta">
+            <span className={`priority-badge priority-${task.priority || 'medium'}`}>
+              {PRIORITY_LABELS[task.priority] || PRIORITY_LABELS.medium}
+            </span>
+            {task.dueDate && <span className="due-date-badge">📅 {task.dueDate}</span>}
+          </div>
+        </div>
+
+        <div className="task-actions">
+          <button type="button" className="edit-button" onClick={() => setIsEditing(true)}>Redaktə</button>
+          <button type="button" className="danger-button" onClick={() => setShowConfirm(true)}>Sil</button>
         </div>
       </div>
 
-      <div className="task-actions">
-        <button type="button" className="edit-button" onClick={() => setIsEditing(true)}>Redaktə</button>
-        <button type="button" className="danger-button" onClick={handleDelete}>Sil</button>
-      </div>
-    </div>
+      <ConfirmDialog
+        open={showConfirm}
+        title="Tapşırığı sil"
+        message={`"${task.title}" tapşırığını silmək istədiyinizə əminsiniz?`}
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setShowConfirm(false)}
+      />
+    </>
   );
 };

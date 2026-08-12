@@ -1,21 +1,28 @@
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { addTask } from '../slice/taskSlice';
+import { useToast } from '../../../components/feedback/ToastProvider';
 
 export const TaskForm = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: { priority: 'medium', dueDate: '' },
   });
   const dispatch = useDispatch();
+  const { addToast } = useToast();
 
-  const onSubmit = (data) => {
-    dispatch(addTask({
-      title: data.title,
-      completed: false,
-      priority: data.priority,
-      dueDate: data.dueDate || null,
-    }));
-    reset({ title: '', priority: 'medium', dueDate: '' });
+  const onSubmit = async (data) => {
+    try {
+      await dispatch(addTask({
+        title: data.title,
+        completed: false,
+        priority: data.priority,
+        dueDate: data.dueDate || null,
+      })).unwrap();
+      reset({ title: '', priority: 'medium', dueDate: '' });
+      addToast('Tapşırıq əlavə olundu', 'success');
+    } catch {
+      addToast('Tapşırıq əlavə olunmadı', 'error');
+    }
   };
 
   return (
