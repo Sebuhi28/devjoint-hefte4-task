@@ -49,7 +49,6 @@ export const TasksPage = () => {
     <section className="page-section">
       <div className="page-header">
         <h2>Tapşırıqlar Siyahısı</h2>
-        <p className="page-description">Mock API ilə CRUD, optimistik UI və React Hook Form doğrulaması.</p>
       </div>
 
       <div className="task-stats">
