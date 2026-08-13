@@ -1,4 +1,10 @@
-const STORAGE_KEY = 'mock_tasks';
+import { getStoredUser } from '../../../utils/localStorage';
+
+const getStorageKey = () => {
+  const user = getStoredUser();
+  const userId = user?.id || 'guest';
+  return `mock_tasks_${userId}`;
+};
 
 const seedTasks = [
   { id: '1', title: 'React Router setup etmək', completed: false, priority: 'medium', dueDate: null },
@@ -7,14 +13,15 @@ const seedTasks = [
 const delay = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const loadTasks = () => {
-  const data = localStorage.getItem(STORAGE_KEY);
+  const key = getStorageKey();
+  const data = localStorage.getItem(key);
   if (data) return JSON.parse(data);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(seedTasks));
+  localStorage.setItem(key, JSON.stringify(seedTasks));
   return seedTasks;
 };
 
 const saveTasks = (tasks) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  localStorage.setItem(getStorageKey(), JSON.stringify(tasks));
 };
 
 export const fetchTasksApi = async () => {
