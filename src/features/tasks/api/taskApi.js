@@ -1,26 +1,57 @@
-import { api } from '../../../services/apiConfig';
+const STORAGE_KEY = 'mock_tasks';
+
+const seedTasks = [
+  { id: '1', title: 'React Router setup etmək', completed: false, priority: 'medium', dueDate: null },
+];
+
+const delay = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const loadTasks = () => {
+  const data = localStorage.getItem(STORAGE_KEY);
+  if (data) return JSON.parse(data);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(seedTasks));
+  return seedTasks;
+};
+
+const saveTasks = (tasks) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+};
 
 export const fetchTasksApi = async () => {
-  const response = await api.get('/tasks');
-  return response.data;
+  await delay();
+  return loadTasks();
 };
 
 export const addTaskApi = async (newTask) => {
-  const response = await api.post('/tasks', newTask);
-  return response.data;
+  await delay();
+  const tasks = loadTasks();
+  const created = { ...newTask, id: Date.now().toString() };
+  const updated = [...tasks, created];
+  saveTasks(updated);
+  return created;
 };
 
 export const deleteTaskApi = async (id) => {
-  await api.delete(`/tasks/${id}`);
+  await delay();
+  const tasks = loadTasks();
+  saveTasks(tasks.filter((task) => task.id !== id));
   return id;
 };
 
 export const toggleTaskApi = async (task) => {
-  const response = await api.patch(`/tasks/${task.id}`, { completed: !task.completed });
-  return response.data;
+  await delay();
+  const tasks = loadTasks();
+  const updated = tasks.map((item) =>
+    item.id === task.id ? { ...item, completed: !item.completed } : item
+  );
+  saveTasks(updated);
+  return updated.find((item) => item.id === task.id);
 };
 
 export const updateTaskApi = async (id, changes) => {
-  const response = await api.patch(`/tasks/${id}`, changes);
-  return response.data;
+  await delay();
+  const tasks = loadTasks();
+  const updated = tasks.map((item) => (item.id === id ? { ...item, ...changes } : item));
+  saveTasks(updated);
+  return updated.find((item) => item.id === id);
 };
